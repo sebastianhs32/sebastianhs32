@@ -1,0 +1,329 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/sebastianhs32/sebastianhs32/blob/main/Codigo_robotica_cinematica_inversa\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "l8g-av947OTd"
+      },
+      "outputs": [],
+      "source": [
+        "from sympy import *"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "theta = [Symbol('q_1'),Symbol('q_2'),0]\n",
+        "alpha = [0,pi/2,-pi/2]\n",
+        "d = [Symbol('l_1'),0,Symbol('q_3')]\n",
+        "a = [0,0,0]"
+      ],
+      "metadata": {
+        "id": "l0UwSSCl9rFX"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "T = []\n",
+        "for i in range(0,3):\n",
+        "  T.append(Matrix([[cos(theta[i]),-sin(theta[i]),0,a[i]],\n",
+        "                   [sin(theta[i])*cos(alpha[i]),cos(theta[i])*cos(alpha[i]),-sin(alpha[i]),-sin(alpha[i])*d[i]],\n",
+        "                   [sin(theta[i])*sin(alpha[i]),cos(theta[i])*sin(alpha[i]),cos(alpha[i]),cos(alpha[i])*d[i]],\n",
+        "                   [0,0,0,1]]))"
+      ],
+      "metadata": {
+        "id": "VJNhJKZV-BKS"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "T03 = T[0]*T[1]*T[2]"
+      ],
+      "metadata": {
+        "id": "DqMeNskB_Esc"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "simplify(T03)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 98
+        },
+        "id": "2GS5j7FI_i8S",
+        "outputId": "bf76d8ef-672e-4273-d130-59baa4416f82"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Matrix([\n",
+              "[cos(q_1)*cos(q_2), -sin(q_1), -sin(q_2)*cos(q_1), -q_3*sin(q_2)*cos(q_1)],\n",
+              "[sin(q_1)*cos(q_2),  cos(q_1), -sin(q_1)*sin(q_2), -q_3*sin(q_1)*sin(q_2)],\n",
+              "[         sin(q_2),         0,           cos(q_2),     l_1 + q_3*cos(q_2)],\n",
+              "[                0,         0,                  0,                      1]])"
+            ],
+            "text/latex": "$\\displaystyle \\left[\\begin{matrix}\\cos{\\left(q_{1} \\right)} \\cos{\\left(q_{2} \\right)} & - \\sin{\\left(q_{1} \\right)} & - \\sin{\\left(q_{2} \\right)} \\cos{\\left(q_{1} \\right)} & - q_{3} \\sin{\\left(q_{2} \\right)} \\cos{\\left(q_{1} \\right)}\\\\\\sin{\\left(q_{1} \\right)} \\cos{\\left(q_{2} \\right)} & \\cos{\\left(q_{1} \\right)} & - \\sin{\\left(q_{1} \\right)} \\sin{\\left(q_{2} \\right)} & - q_{3} \\sin{\\left(q_{1} \\right)} \\sin{\\left(q_{2} \\right)}\\\\\\sin{\\left(q_{2} \\right)} & 0 & \\cos{\\left(q_{2} \\right)} & l_{1} + q_{3} \\cos{\\left(q_{2} \\right)}\\\\0 & 0 & 0 & 1\\end{matrix}\\right]$"
+          },
+          "metadata": {},
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "simplify(T[0].inv())"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 98
+        },
+        "id": "k8KomGPk_oiK",
+        "outputId": "dd31b2de-918d-4781-9bf5-0b494762ec05"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Matrix([\n",
+              "[ cos(q_1), sin(q_1), 0,    0],\n",
+              "[-sin(q_1), cos(q_1), 0,    0],\n",
+              "[        0,        0, 1, -l_1],\n",
+              "[        0,        0, 0,    1]])"
+            ],
+            "text/latex": "$\\displaystyle \\left[\\begin{matrix}\\cos{\\left(q_{1} \\right)} & \\sin{\\left(q_{1} \\right)} & 0 & 0\\\\- \\sin{\\left(q_{1} \\right)} & \\cos{\\left(q_{1} \\right)} & 0 & 0\\\\0 & 0 & 1 & - l_{1}\\\\0 & 0 & 0 & 1\\end{matrix}\\right]$"
+          },
+          "metadata": {},
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "T13= T[1]*T[2]\n",
+        "simplify(T13)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 98
+        },
+        "id": "1xApwrahBNyL",
+        "outputId": "47a7e4f3-5eb6-42a9-9ad8-d8958bdbdc62"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Matrix([\n",
+              "[cos(q_2), 0, -sin(q_2), -q_3*sin(q_2)],\n",
+              "[       0, 1,         0,             0],\n",
+              "[sin(q_2), 0,  cos(q_2),  q_3*cos(q_2)],\n",
+              "[       0, 0,         0,             1]])"
+            ],
+            "text/latex": "$\\displaystyle \\left[\\begin{matrix}\\cos{\\left(q_{2} \\right)} & 0 & - \\sin{\\left(q_{2} \\right)} & - q_{3} \\sin{\\left(q_{2} \\right)}\\\\0 & 1 & 0 & 0\\\\\\sin{\\left(q_{2} \\right)} & 0 & \\cos{\\left(q_{2} \\right)} & q_{3} \\cos{\\left(q_{2} \\right)}\\\\0 & 0 & 0 & 1\\end{matrix}\\right]$"
+          },
+          "metadata": {},
+          "execution_count": 20
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "display(simplify(T[1].inv()))\n",
+        "simplify(T[1].inv()*T[0].inv())"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 180
+        },
+        "id": "0t6yD7urFkst",
+        "outputId": "a680ea03-3139-4318-b4f5-54fcb095cb64"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "Matrix([\n",
+              "[ cos(q_2),  0, sin(q_2), 0],\n",
+              "[-sin(q_2),  0, cos(q_2), 0],\n",
+              "[        0, -1,        0, 0],\n",
+              "[        0,  0,        0, 1]])"
+            ],
+            "text/latex": "$\\displaystyle \\left[\\begin{matrix}\\cos{\\left(q_{2} \\right)} & 0 & \\sin{\\left(q_{2} \\right)} & 0\\\\- \\sin{\\left(q_{2} \\right)} & 0 & \\cos{\\left(q_{2} \\right)} & 0\\\\0 & -1 & 0 & 0\\\\0 & 0 & 0 & 1\\end{matrix}\\right]$"
+          },
+          "metadata": {}
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Matrix([\n",
+              "[ cos(q_1)*cos(q_2),  sin(q_1)*cos(q_2), sin(q_2), -l_1*sin(q_2)],\n",
+              "[-sin(q_2)*cos(q_1), -sin(q_1)*sin(q_2), cos(q_2), -l_1*cos(q_2)],\n",
+              "[          sin(q_1),          -cos(q_1),        0,             0],\n",
+              "[                 0,                  0,        0,             1]])"
+            ],
+            "text/latex": "$\\displaystyle \\left[\\begin{matrix}\\cos{\\left(q_{1} \\right)} \\cos{\\left(q_{2} \\right)} & \\sin{\\left(q_{1} \\right)} \\cos{\\left(q_{2} \\right)} & \\sin{\\left(q_{2} \\right)} & - l_{1} \\sin{\\left(q_{2} \\right)}\\\\- \\sin{\\left(q_{2} \\right)} \\cos{\\left(q_{1} \\right)} & - \\sin{\\left(q_{1} \\right)} \\sin{\\left(q_{2} \\right)} & \\cos{\\left(q_{2} \\right)} & - l_{1} \\cos{\\left(q_{2} \\right)}\\\\\\sin{\\left(q_{1} \\right)} & - \\cos{\\left(q_{1} \\right)} & 0 & 0\\\\0 & 0 & 0 & 1\\end{matrix}\\right]$"
+          },
+          "metadata": {},
+          "execution_count": 24
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "display(T[2])"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 98
+        },
+        "id": "gxeW3X7vGFcI",
+        "outputId": "9e365795-7210-4031-a011-8fd21c2b00d3"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "Matrix([\n",
+              "[1,  0, 0,   0],\n",
+              "[0,  0, 1, q_3],\n",
+              "[0, -1, 0,   0],\n",
+              "[0,  0, 0,   1]])"
+            ],
+            "text/latex": "$\\displaystyle \\left[\\begin{matrix}1 & 0 & 0 & 0\\\\0 & 0 & 1 & q_{3}\\\\0 & -1 & 0 & 0\\\\0 & 0 & 0 & 1\\end{matrix}\\right]$"
+          },
+          "metadata": {}
+        }
+      ]
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "##No usado"
+      ],
+      "metadata": {
+        "id": "OX7LzZ-tFdzb"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "T02= T[0]*T[1]\n",
+        "display(T02)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 98
+        },
+        "id": "A3BZanioBWNS",
+        "outputId": "f48e4089-3541-45eb-e369-548815e82a9d"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "display_data",
+          "data": {
+            "text/plain": [
+              "Matrix([\n",
+              "[cos(q_1)*cos(q_2), -sin(q_2)*cos(q_1),  sin(q_1),   0],\n",
+              "[sin(q_1)*cos(q_2), -sin(q_1)*sin(q_2), -cos(q_1),   0],\n",
+              "[         sin(q_2),           cos(q_2),         0, l_1],\n",
+              "[                0,                  0,         0,   1]])"
+            ],
+            "text/latex": "$\\displaystyle \\left[\\begin{matrix}\\cos{\\left(q_{1} \\right)} \\cos{\\left(q_{2} \\right)} & - \\sin{\\left(q_{2} \\right)} \\cos{\\left(q_{1} \\right)} & \\sin{\\left(q_{1} \\right)} & 0\\\\\\sin{\\left(q_{1} \\right)} \\cos{\\left(q_{2} \\right)} & - \\sin{\\left(q_{1} \\right)} \\sin{\\left(q_{2} \\right)} & - \\cos{\\left(q_{1} \\right)} & 0\\\\\\sin{\\left(q_{2} \\right)} & \\cos{\\left(q_{2} \\right)} & 0 & l_{1}\\\\0 & 0 & 0 & 1\\end{matrix}\\right]$"
+          },
+          "metadata": {}
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "T[2].inv()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 98
+        },
+        "id": "JmvrCQooEz3r",
+        "outputId": "0c478613-6428-478e-84e5-b53952b6b04a"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "Matrix([\n",
+              "[1, 0,  0,    0],\n",
+              "[0, 0, -1,    0],\n",
+              "[0, 1,  0, -q_3],\n",
+              "[0, 0,  0,    1]])"
+            ],
+            "text/latex": "$\\displaystyle \\left[\\begin{matrix}1 & 0 & 0 & 0\\\\0 & 0 & -1 & 0\\\\0 & 1 & 0 & - q_{3}\\\\0 & 0 & 0 & 1\\end{matrix}\\right]$"
+          },
+          "metadata": {},
+          "execution_count": 19
+        }
+      ]
+    }
+  ]
+}
